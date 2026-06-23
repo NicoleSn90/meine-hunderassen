@@ -1,0 +1,4 @@
+github key.rtf
+*.rtf
+*.token
+.env
