@@ -324,12 +324,16 @@
     }
     .field input:focus { outline: none; border-color: var(--accent-dark); box-shadow: 0 0 0 3px rgba(29, 77, 62, 0.12); }
     .lead-form .btn-submit {
+      display: block;
       margin-top: 6px;
       font-size: 1.05rem;
-      padding: 16px;
+      line-height: 1.4;
+      text-align: center;
+      padding: 16px 24px;
       width: 100%;
+      min-height: 52px;
       background: linear-gradient(135deg, var(--accent-dark), var(--accent-med));
-      color: #fff;
+      color: #fff !important;
       font-weight: 700;
       border-radius: 999px;
       border: none;
