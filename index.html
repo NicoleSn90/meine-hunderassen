@@ -387,6 +387,7 @@
             <label for="email">E-Mail-Adresse</label>
             <input type="email" id="email" name="email" placeholder="du@beispiel.de" required autocomplete="email" />
           </div>
+          <input type="checkbox" name="botcheck" id="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
           <button type="submit" class="btn" id="submitBtn">Guide kostenlos herunterladen</button>
           <p class="form-note">Kein Spam. Abmeldung jederzeit möglich.</p>
           <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
@@ -428,18 +429,28 @@
           return;
         }
 
+        // Spam-Honeypot: ausgefüllt = Bot -> still abbrechen
+        if (form.botcheck && form.botcheck.checked) { return; }
+
         btn.disabled = true;
         const original = btn.textContent;
         btn.textContent = 'Wird gesendet …';
 
         try {
-          const res = await fetch('/api/lead', {
+          const res = await fetch('https://api.web3forms.com/submit', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ firstName, email })
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+              access_key: '54cbfbc7-9123-45a6-aa7b-dcc12cc22535',
+              subject: 'Neue Anmeldung: Anti-Stress-Guide',
+              from_name: 'Ruhepuls Anti-Stress-Guide',
+              name: firstName,
+              email: email
+            })
           });
 
-          if (!res.ok) throw new Error('Serverfehler ' + res.status);
+          const data = await res.json();
+          if (!data.success) throw new Error(data.message || 'Serverfehler');
 
           showStatus('success', 'Geschafft, ' + firstName + '! Dein Anti-Stress-Guide ist auf dem Weg in dein Postfach. 🌿');
           form.reset();
