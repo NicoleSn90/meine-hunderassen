@@ -375,23 +375,8 @@
   <section id="download" class="lead-section">
     <div class="container">
       <div class="lead-card">
-        <span class="mini-badge">🌿 Kostenlos &amp; sofort</span>
-        <h2>Hol dir deinen Anti-Stress-Guide</h2>
-        <p>Trag deinen Vornamen und deine E-Mail ein – wir schicken dir den Guide direkt per E-Mail.</p>
-        <form class="lead-form" id="leadForm" novalidate>
-          <div class="field">
-            <label for="firstName">Vorname</label>
-            <input type="text" id="firstName" name="firstName" placeholder="Dein Vorname" required autocomplete="given-name" />
-          </div>
-          <div class="field">
-            <label for="email">E-Mail-Adresse</label>
-            <input type="email" id="email" name="email" placeholder="du@beispiel.de" required autocomplete="email" />
-          </div>
-          <input type="checkbox" name="botcheck" id="botcheck" style="display:none;" tabindex="-1" autocomplete="off" />
-          <button type="submit" class="btn" id="submitBtn">Guide kostenlos herunterladen</button>
-          <p class="form-note">Kein Spam. Abmeldung jederzeit möglich.</p>
-          <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
-        </form>
+        <!-- Klaviyo Embed-Formular (Anti-Stress-Guide, Form-ID VpHUpc) -->
+        <div class="klaviyo-form-VpHUpc"></div>
       </div>
     </div>
   </section>
@@ -403,73 +388,8 @@
     </div>
   </footer>
 
-  <script>
-    (function () {
-      const form = document.getElementById('leadForm');
-      const status = document.getElementById('formStatus');
-      const btn = document.getElementById('submitBtn');
-
-      function showStatus(type, msg) {
-        status.className = 'form-status ' + type;
-        status.textContent = msg;
-      }
-
-      form.addEventListener('submit', async function (e) {
-        e.preventDefault();
-
-        const firstName = form.firstName.value.trim();
-        const email = form.email.value.trim();
-
-        if (!firstName || !email) {
-          showStatus('error', 'Bitte fülle beide Felder aus.');
-          return;
-        }
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          showStatus('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
-          return;
-        }
-
-        // Spam-Honeypot: ausgefüllt = Bot -> still abbrechen
-        if (form.botcheck && form.botcheck.checked) { return; }
-
-        btn.disabled = true;
-        const original = btn.textContent;
-        btn.textContent = 'Wird gesendet …';
-
-        try {
-          const res = await fetch('https://api.web3forms.com/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({
-              access_key: '54cbfbc7-9123-45a6-aa7b-dcc12cc22535',
-              subject: 'Neue Anmeldung: Anti-Stress-Guide',
-              from_name: 'Ruhepuls Anti-Stress-Guide',
-              name: firstName,
-              email: email
-            })
-          });
-
-          const data = await res.json();
-          if (!data.success) throw new Error(data.message || 'Serverfehler');
-
-          const safeName = firstName.replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
-          });
-          status.className = 'form-status success';
-          status.innerHTML =
-            'Geschafft, ' + safeName + '! 🌿 Bitte bestätige kurz die E-Mail, die wir dir gerade geschickt haben. ' +
-            'Deinen Guide kannst du hier direkt herunterladen:' +
-            '<br><a class="btn" style="margin-top:12px; display:inline-block;" href="guide/anti-stress-guide.pdf" target="_blank" rel="noopener" download>📄 Anti-Stress-Guide herunterladen</a>';
-          form.reset();
-        } catch (err) {
-          showStatus('error', 'Ups, das hat nicht geklappt. Bitte versuche es später erneut.');
-        } finally {
-          btn.disabled = false;
-          btn.textContent = original;
-        }
-      });
-    })();
-  </script>
+  <!-- Klaviyo Onsite-Loader (lädt das Embed-Formular VpHUpc) -->
+  <script async type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=Wuzq5s"></script>
 
 </body>
 </html>
