@@ -371,7 +371,6 @@
     }
     .hero-partner strong { color: var(--accent-dark); font-weight: 700; }
   </style>
-  <script async type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=Wuzq5s"></script>
 </head>
 <body>
 
@@ -501,8 +500,19 @@
         <span class="mini-badge">🍃 Kostenlos & sofort</span>
         <h2>Bereit, wieder runterzukommen?</h2>
         <p>Trag dich kurz ein – du bekommst den Guide direkt per E-Mail. Mit Hintergrundwissen, ehrlich eingeordneten Bausteinen und vielen kleinen Alltagstipps.</p>
-        <div class="klaviyo-form-VMwrhH"></div>
-        <p class="form-note">Der Guide wird dir von <strong>Viktilabs</strong> bereitgestellt – deine Bestätigungsmail kommt daher von Viktilabs.</p>
+        <form class="lead-form" id="leadForm" novalidate>
+          <div class="field">
+            <label for="firstName">Vorname</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Dein Vorname" required autocomplete="given-name" />
+          </div>
+          <div class="field">
+            <label for="email">E-Mail-Adresse</label>
+            <input type="email" id="email" name="email" placeholder="du@beispiel.de" required autocomplete="email" />
+          </div>
+          <button type="submit" class="btn-submit" id="submitBtn">🍃 Guide jetzt anfordern</button>
+          <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+        </form>
+        <p class="form-note">Kein Spam, Abmeldung jederzeit möglich. Der Guide wird dir von <strong>Viktilabs</strong> bereitgestellt – deine Bestätigungsmail kommt daher von Viktilabs.</p>
       </div>
     </div>
   </section>
@@ -515,6 +525,82 @@
     </div>
   </footer>
 
+  <script>
+    (function () {
+      const form = document.getElementById('leadForm');
+      const status = document.getElementById('formStatus');
+      const btn = document.getElementById('submitBtn');
+
+      function showStatus(type, msg) {
+        status.className = 'form-status ' + type;
+        status.textContent = msg;
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const firstName = form.firstName.value.trim();
+        const email = form.email.value.trim();
+
+        if (!firstName || !email) {
+          showStatus('error', 'Bitte fülle beide Felder aus.');
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showStatus('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+          return;
+        }
+
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Wird gesendet …';
+
+        try {
+          const res = await fetch('https://a.klaviyo.com/client/subscriptions/?company_id=Wuzq5s', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'revision': '2023-02-22'
+            },
+            body: JSON.stringify({
+              data: {
+                type: 'subscription',
+                attributes: {
+                  profile: {
+                    data: {
+                      type: 'profile',
+                      attributes: {
+                        email: email,
+                        first_name: firstName
+                      }
+                    }
+                  }
+                },
+                relationships: {
+                  list: {
+                    data: { type: 'list', id: 'TZ24Ay' }
+                  }
+                }
+              }
+            })
+          });
+
+          // Klaviyo gibt 202 zurück (kein JSON-Body)
+          if (res.status === 202 || res.ok) {
+            showStatus('success', '🌿 Fast geschafft, ' + firstName + '! Bitte bestätige kurz die E-Mail in deinem Postfach – dann ist dein Guide auf dem Weg zu dir.');
+            form.reset();
+          } else {
+            throw new Error('Status ' + res.status);
+          }
+        } catch (err) {
+          showStatus('error', 'Ups, das hat nicht geklappt. Bitte versuche es später erneut.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = original;
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
