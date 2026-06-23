@@ -287,10 +287,62 @@
       font-family: -apple-system, sans-serif;
     }
 
-    /* Klaviyo Form Styling */
-    .klaviyo-form-VpHUpc {
-      max-width: 100%;
+    /* Lead Form */
+    .mini-badge {
+      display: inline-block;
+      background: var(--pastell-sage);
+      color: var(--accent-dark);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 7px 15px;
+      border-radius: 999px;
+      margin-bottom: 18px;
+      font-family: -apple-system, sans-serif;
     }
+    .lead-card h2 {
+      font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+      margin-bottom: 12px;
+      color: var(--accent-dark);
+    }
+    .lead-card > p {
+      color: var(--text-light);
+      margin-bottom: 28px;
+      font-family: -apple-system, sans-serif;
+    }
+    .lead-form { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+    .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-light); font-family: -apple-system, sans-serif; }
+    .field input {
+      width: 100%;
+      padding: 15px 18px;
+      background: #fff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      color: var(--text);
+      font-size: 1rem;
+      font-family: -apple-system, sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus { outline: none; border-color: var(--accent-dark); box-shadow: 0 0 0 3px rgba(29, 77, 62, 0.12); }
+    .lead-form .btn-submit {
+      margin-top: 6px;
+      font-size: 1.05rem;
+      padding: 16px;
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent-dark), var(--accent-med));
+      color: #fff;
+      font-weight: 700;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-family: -apple-system, sans-serif;
+      transition: transform 0.15s, box-shadow 0.2s;
+    }
+    .lead-form .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(29, 77, 62, 0.25); }
+    .lead-form .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .form-note { font-size: 0.8rem; color: var(--text-light); text-align: center; font-family: -apple-system, sans-serif; }
+    .form-status { margin-top: 14px; padding: 16px; border-radius: 14px; font-size: 0.95rem; display: none; font-family: -apple-system, sans-serif; }
+    .form-status.success { display: block; background: rgba(29, 77, 62, 0.08); border: 1.5px solid var(--accent-med); color: var(--accent-dark); }
+    .form-status.error { display: block; background: rgba(180, 60, 50, 0.07); border: 1.5px solid #b43c32; color: #8b2d24; }
 
     /* Footer */
     footer {
@@ -428,8 +480,22 @@
   <section id="download" class="lead-section">
     <div class="container">
       <div class="lead-card">
-        <!-- Klaviyo Embed-Formular (Anti-Stress-Guide, Form-ID VpHUpc) -->
-        <div class="klaviyo-form-VpHUpc"></div>
+        <span class="mini-badge">🍃 Kostenlos & sofort</span>
+        <h2>Hol dir deinen Anti-Stress-Guide</h2>
+        <p>Trag dich ein und erhalte deinen persönlichen Guide für mehr Ruhe und Gelassenheit.</p>
+        <form class="lead-form" id="leadForm" novalidate>
+          <div class="field">
+            <label for="firstName">Vorname</label>
+            <input type="text" id="firstName" name="firstName" placeholder="Dein Vorname" required autocomplete="given-name" />
+          </div>
+          <div class="field">
+            <label for="email">E-Mail-Adresse</label>
+            <input type="email" id="email" name="email" placeholder="du@beispiel.de" required autocomplete="email" />
+          </div>
+          <button type="submit" class="btn-submit" id="submitBtn">🍃 Guide jetzt anfordern</button>
+          <p class="form-note">Kein Spam. Abmeldung jederzeit möglich. Du erhältst eine Bestätigungsmail.</p>
+          <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+        </form>
       </div>
     </div>
   </section>
@@ -441,8 +507,82 @@
     </div>
   </footer>
 
-  <!-- Klaviyo Onsite-Loader (lädt das Embed-Formular VpHUpc) -->
-  <script async type="text/javascript" src="https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=Wuzq5s"></script>
+  <script>
+    (function () {
+      const form = document.getElementById('leadForm');
+      const status = document.getElementById('formStatus');
+      const btn = document.getElementById('submitBtn');
+
+      function showStatus(type, msg) {
+        status.className = 'form-status ' + type;
+        status.textContent = msg;
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const firstName = form.firstName.value.trim();
+        const email = form.email.value.trim();
+
+        if (!firstName || !email) {
+          showStatus('error', 'Bitte fülle beide Felder aus.');
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          showStatus('error', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+          return;
+        }
+
+        btn.disabled = true;
+        const original = btn.textContent;
+        btn.textContent = 'Wird gesendet …';
+
+        try {
+          const res = await fetch('https://a.klaviyo.com/client/subscriptions/?company_id=Wuzq5s', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'revision': '2023-02-22'
+            },
+            body: JSON.stringify({
+              data: {
+                type: 'subscription',
+                attributes: {
+                  profile: {
+                    data: {
+                      type: 'profile',
+                      attributes: {
+                        email: email,
+                        first_name: firstName
+                      }
+                    }
+                  }
+                },
+                relationships: {
+                  list: {
+                    data: { type: 'list', id: 'TZ24Ay' }
+                  }
+                }
+              }
+            })
+          });
+
+          // Klaviyo gibt 202 zurück (kein JSON-Body)
+          if (res.status === 202 || res.ok) {
+            showStatus('success', '🌿 Fast geschafft, ' + firstName + '! Bitte bestätige kurz die E-Mail in deinem Postfach – dann ist dein Guide auf dem Weg zu dir.');
+            form.reset();
+          } else {
+            throw new Error('Status ' + res.status);
+          }
+        } catch (err) {
+          showStatus('error', 'Ups, das hat nicht geklappt. Bitte versuche es später erneut.');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = original;
+        }
+      });
+    })();
+  </script>
 
 </body>
 </html>
